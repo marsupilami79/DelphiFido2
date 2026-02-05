@@ -128,7 +128,21 @@ const WEBAUTHN_API_VERSION_1 = 1;
 //          - WEBAUTHN_CREDENTIAL_ATTESTATION                   :   7
 //          - WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS      :   8
 
-            WEBAUTHN_API_CURRENT_VERSION = WEBAUTHN_API_VERSION_8;
+            WEBAUTHN_API_VERSION_9 = 9;
+// WEBAUTHN_API_VERSION_9 : Delta From WEBAUTHN_API_VERSION_8
+//      Data Structures and their sub versions:
+//          - WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS    :   9
+//          - WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS      :   9
+//          - WEBAUTHN_ASSERTION                                :   6
+//          - WEBAUTHN_CREDENTIAL_DETAILS                       :   4
+//          - WEBAUTHN_CREDENTIAL_ATTESTATION                   :   8
+//          - WEBAUTHN_AUTHENTICATOR_DETAILS                    :   1
+//          - WEBAUTHN_AUTHENTICATOR_DETAILS_LIST               :   Not Applicable
+//      APIs:
+//          - WebAuthNGetAuthenticatorList
+//          - WebAuthNFreeAuthenticatorList
+
+            WEBAUTHN_API_CURRENT_VERSION = WEBAUTHN_API_VERSION_9;
 //+------------------------------------------------------------------------------------------
 // Information about an RP Entity
 //-------------------------------------------------------------------------------------------
@@ -314,6 +328,14 @@ const WEBAUTHN_CTAP_TRANSPORT_USB = $00000001;
       WEBAUTHN_CTAP_TRANSPORT_HYBRID = $00000020;
       WEBAUTHN_CTAP_TRANSPORT_FLAGS_MASK = $0000003F;
 
+      WEBAUTHN_CTAP_TRANSPORT_USB_STRING        = 'usb';
+      WEBAUTHN_CTAP_TRANSPORT_NFC_STRING        = 'nfc';
+      WEBAUTHN_CTAP_TRANSPORT_BLE_STRING        = 'ble';
+      WEBAUTHN_CTAP_TRANSPORT_SMART_CARD_STRING = 'smart-card';
+      WEBAUTHN_CTAP_TRANSPORT_HYBRID_STRING     = 'hybrid';
+      WEBAUTHN_CTAP_TRANSPORT_INTERNAL_STRING   = 'internal';
+
+
       WEBAUTHN_CREDENTIAL_EX_CURRENT_VERSION = 1;
 
 type
@@ -351,12 +373,13 @@ type
   PWEBAUTHN_CREDENTIAL_LIST = ^WEBAUTHN_CREDENTIAL_LIST;
 
 //+------------------------------------------------------------------------------------------
-// Credential Information for WebAuthNGetPlatformCredentialList API
+// Information about linked devices
 //-------------------------------------------------------------------------------------------
 
 const CTAPCBOR_HYBRID_STORAGE_LINKED_DATA_VERSION_1 = 1;
       CTAPCBOR_HYBRID_STORAGE_LINKED_DATA_CURRENT_VERSION = CTAPCBOR_HYBRID_STORAGE_LINKED_DATA_VERSION_1;
 
+// Deprecated
 type
   _CTAPCBOR_HYBRID_STORAGE_LINKED_DATA = packed record
     // Version
@@ -390,11 +413,75 @@ type
   end;
   CTAPCBOR_HYBRID_STORAGE_LINKED_DATA = _CTAPCBOR_HYBRID_STORAGE_LINKED_DATA;
   PCTAPCBOR_HYBRID_STORAGE_LINKED_DATA = ^CTAPCBOR_HYBRID_STORAGE_LINKED_DATA;
+  PCCTAPCBOR_HYBRID_STORAGE_LINKED_DATA = ^CTAPCBOR_HYBRID_STORAGE_LINKED_DATA;
+
+//+------------------------------------------------------------------------------------------
+// Authenticator Information for WebAuthNGetAuthenticatorList API
+//-------------------------------------------------------------------------------------------
+
+const WEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS_VERSION_1 = 1;
+      WEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS_CURRENT_VERSION = WEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS_VERSION_1;
+
+type
+  _WEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS = packed record
+    // Version of this structure, to allow for modifications in the future.
+    dwVersion : DWORD;
+  end;
+  WEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS = _WEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS;
+  PWEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS = ^WEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS;
+  PCWEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS = ^WEBAUTHN_AUTHENTICATOR_DETAILS_OPTIONS;
+
+const WEBAUTHN_AUTHENTICATOR_DETAILS_VERSION_1 = 1;
+      WEBAUTHN_AUTHENTICATOR_DETAILS_CURRENT_VERSION = WEBAUTHN_AUTHENTICATOR_DETAILS_VERSION_1;
+
+type
+  _WEBAUTHN_AUTHENTICATOR_DETAILS = packed record
+    // Version of this structure, to allow for modifications in the future.
+    dwVersion : DWORD;
+
+    // Authenticator ID
+    cbAuthenticatorId : DWORD;
+    //_Field_size_bytes_(cbAuthenticatorId)
+    pbAuthenticatorId : PBYTE;
+
+    // Authenticator Name
+    pwszAuthenticatorName : PCWSTR;
+
+    // Authenticator logo (expected to be in SVG format)
+    cbAuthenticatorLogo : DWORD;
+    //_Field_size_bytes_(cbAuthenticatorLogo)
+    pbAuthenticatorLogo : PBYTE;
+
+    // Is the authenticator currently locked? When locked, this authenticator's credentials
+    // might not be present or updated in WebAuthNGetPlatformCredentialList.
+    bLocked : BOOL;
+  end;
+  WEBAUTHN_AUTHENTICATOR_DETAILS = _WEBAUTHN_AUTHENTICATOR_DETAILS;
+  PWEBAUTHN_AUTHENTICATOR_DETAILS = ^WEBAUTHN_AUTHENTICATOR_DETAILS;
+  PCWEBAUTHN_AUTHENTICATOR_DETAILS = ^WEBAUTHN_AUTHENTICATOR_DETAILS;
+  PPWEBAUTHN_AUTHENTICATOR_DETAILS = ^PWEBAUTHN_AUTHENTICATOR_DETAILS;
+
+type
+  _WEBAUTHN_AUTHENTICATOR_DETAILS_LIST = packed record
+    // Authenticator Details
+    cAuthenticatorDetails : DWORD;
+    //_Field_size_(cAuthenticatorDetails)
+    ppAuthenticatorDetails : PPWEBAUTHN_AUTHENTICATOR_DETAILS;
+  end;
+  WEBAUTHN_AUTHENTICATOR_DETAILS_LIST = _WEBAUTHN_AUTHENTICATOR_DETAILS_LIST;
+  PWEBAUTHN_AUTHENTICATOR_DETAILS_LIST = ^WEBAUTHN_AUTHENTICATOR_DETAILS_LIST;
+  PCWEBAUTHN_AUTHENTICATOR_DETAILS_LIST = ^WEBAUTHN_AUTHENTICATOR_DETAILS_LIST;
+
+
+//+------------------------------------------------------------------------------------------
+// Credential Information for WebAuthNGetPlatformCredentialList API
+//-------------------------------------------------------------------------------------------
 
 const WEBAUTHN_CREDENTIAL_DETAILS_VERSION_1 = 1;
       WEBAUTHN_CREDENTIAL_DETAILS_VERSION_2 = 2;
       WEBAUTHN_CREDENTIAL_DETAILS_VERSION_3 = 3;
-      WEBAUTHN_CREDENTIAL_DETAILS_CURRENT_VERSION = WEBAUTHN_CREDENTIAL_DETAILS_VERSION_3;
+      WEBAUTHN_CREDENTIAL_DETAILS_VERSION_4 = 4;
+      WEBAUTHN_CREDENTIAL_DETAILS_CURRENT_VERSION = WEBAUTHN_CREDENTIAL_DETAILS_VERSION_4;
 
 type
   _WEBAUTHN_CREDENTIAL_DETAILS = packed record
@@ -433,6 +520,13 @@ type
 
     // ThirdPartyPayment Credential or not.
     bThirdPartyPayment : BOOL;
+
+    //
+    // The following fields have been added in WEBAUTHN_CREDENTIAL_DETAILS_VERSION_4
+    //
+
+    // Applicable Transports
+    dwTransports : DWORD;
   end;
   WEBAUTHN_CREDENTIAL_DETAILS = _WEBAUTHN_CREDENTIAL_DETAILS;
   PWEBAUTHN_CREDENTIAL_DETAILS = ^WEBAUTHN_CREDENTIAL_DETAILS;
@@ -676,6 +770,9 @@ const WEBAUTHN_AUTHENTICATOR_ATTACHMENT_ANY = 0;
       WEBAUTHN_LARGE_BLOB_SUPPORT_REQUIRED = 1;
       WEBAUTHN_LARGE_BLOB_SUPPORT_PREFERRED = 2;
 
+      WEBAUTHN_CREDENTIAL_HINT_SECURITY_KEY = 'security-key';
+      WEBAUTHN_CREDENTIAL_HINT_CLIENT_DEVICE = 'client-device';
+      WEBAUTHN_CREDENTIAL_HINT_HYBRID = 'hybrid';
 
       WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_VERSION_1 = 1;
       WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_VERSION_2 = 2;
@@ -685,7 +782,8 @@ const WEBAUTHN_AUTHENTICATOR_ATTACHMENT_ANY = 0;
       WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_VERSION_6 = 6;
       WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_VERSION_7 = 7;
       WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_VERSION_8 = 8;
-      WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_CURRENT_VERSION = WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_VERSION_8;
+      WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_VERSION_9 = 9;
+      WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_CURRENT_VERSION = WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_VERSION_9;
 
 type
   _WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS = packed record
@@ -790,6 +888,23 @@ type
 
     // Enable ThirdPartyPayment
     bThirdPartyPayment : BOOL;
+
+     //
+    // The following fields have been added in WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS_VERSION_9
+    //
+
+    // Web Origin. For Remote Web App scenario.
+    pwszRemoteWebOrigin : PCWSTR;
+
+    // UTF-8 encoded JSON serialization of the PublicKeyCredentialCreationOptions.
+    cbPublicKeyCredentialCreationOptionsJSON : DWORD;
+    // _Field_size_bytes_(cbPublicKeyCredentialCreationOptionsJSON)
+    pbPublicKeyCredentialCreationOptionsJSON : PBYTE;
+
+    // Authenticator ID got from WebAuthNGetAuthenticatorList API.
+    cbAuthenticatorId : DWORD;
+    // _Field_size_bytes_(cbAuthenticatorId)
+    pbAuthenticatorId : PBYTE;
   end;
 
   WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS = _WEBAUTHN_AUTHENTICATOR_MAKE_CREDENTIAL_OPTIONS;
@@ -811,7 +926,8 @@ const WEBAUTHN_CRED_LARGE_BLOB_OPERATION_NONE = 0;
       WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS_VERSION_6 = 6;
       WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS_VERSION_7 = 7;
       WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS_VERSION_8 = 8;
-      WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS_CURRENT_VERSION = WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS_VERSION_8;
+      WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS_VERSION_9 = 9;
+      WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS_CURRENT_VERSION = WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS_VERSION_9;
 
 (*
     Information about flags.
@@ -913,6 +1029,23 @@ type
     cCredentialHints : DWORD;
     //_Field_size_(cCredentialHints)
     ppwszCredentialHints : PLPWSTR;
+
+    //
+    // The following fields have been added in WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS_VERSION_9
+    //
+
+    // Web Origin. For Remote Web App scenario.
+    pwszRemoteWebOrigin : PCWSTR;
+
+    // UTF-8 encoded JSON serialization of the PublicKeyCredentialRequestOptions.
+    cbPublicKeyCredentialRequestOptionsJSON : DWORD;
+    //_Field_size_bytes_(cbPublicKeyCredentialRequestOptionsJSON)
+    pbPublicKeyCredentialRequestOptionsJSON : PBYTE;
+
+    // Authenticator ID got from WebAuthNGetAuthenticatorList API.
+    cbAuthenticatorId : DWORD;
+    // _Field_size_bytes_(cbAuthenticatorId)
+    pbAuthenticatorId : PBYTE;
   end;
   WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS = _WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS;
   PWEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS = ^WEBAUTHN_AUTHENTICATOR_GET_ASSERTION_OPTIONS;
@@ -1000,7 +1133,8 @@ const WEBAUTHN_ATTESTATION_TYPE_PACKED = 'packed';
       WEBAUTHN_CREDENTIAL_ATTESTATION_VERSION_5 = 5;
       WEBAUTHN_CREDENTIAL_ATTESTATION_VERSION_6 = 6;
       WEBAUTHN_CREDENTIAL_ATTESTATION_VERSION_7 = 7;
-      WEBAUTHN_CREDENTIAL_ATTESTATION_CURRENT_VERSION = WEBAUTHN_CREDENTIAL_ATTESTATION_VERSION_7;
+      WEBAUTHN_CREDENTIAL_ATTESTATION_VERSION_8 = 8;
+      WEBAUTHN_CREDENTIAL_ATTESTATION_CURRENT_VERSION = WEBAUTHN_CREDENTIAL_ATTESTATION_VERSION_8;
 
 type
   _WEBAUTHN_CREDENTIAL_ATTESTATION = packed record
@@ -1087,6 +1221,23 @@ type
     // ThirdPartyPayment Credential or not.
     bThirdPartyPayment : BOOL;
 
+    //
+    // Following fields have been added in WEBAUTHN_CREDENTIAL_ATTESTATION_VERSION_8
+    //
+
+    // Multiple WEBAUTHN_CTAP_TRANSPORT_* bits will be set corresponding to
+    // the transports that are supported.
+    dwTransports : DWORD;
+
+    // UTF-8 encoded JSON serialization of the client data.
+    cbClientDataJSON : DWORD;
+    //_Field_size_bytes_(cbClientDataJSON)
+    pbClientDataJSON : PBYTE;
+
+    // UTF-8 encoded JSON serialization of the RegistrationResponse.
+    cbRegistrationResponseJSON : DWORD;
+    //_Field_size_bytes_(cbRegistrationResponseJSON)
+    pbRegistrationResponseJSON : PBYTE;
   end;
   WEBAUTHN_CREDENTIAL_ATTESTATION = _WEBAUTHN_CREDENTIAL_ATTESTATION;
   PWEBAUTHN_CREDENTIAL_ATTESTATION = ^WEBAUTHN_CREDENTIAL_ATTESTATION;
@@ -1112,7 +1263,8 @@ const WEBAUTHN_CRED_LARGE_BLOB_STATUS_NONE                  =  0;
       WEBAUTHN_ASSERTION_VERSION_3                          = 3;
       WEBAUTHN_ASSERTION_VERSION_4                          = 4;
       WEBAUTHN_ASSERTION_VERSION_5                          = 5;
-      WEBAUTHN_ASSERTION_CURRENT_VERSION = WEBAUTHN_ASSERTION_VERSION_5;
+      WEBAUTHN_ASSERTION_VERSION_6                          = 6;
+      WEBAUTHN_ASSERTION_CURRENT_VERSION = WEBAUTHN_ASSERTION_VERSION_6;
 
 type
   _WEBAUTHN_ASSERTION = packed record
@@ -1173,6 +1325,20 @@ type
     cbUnsignedExtensionOutputs : DWORD;
     // _Field_size_bytes_(cbUnsignedExtensionOutputs)
     pbUnsignedExtensionOutputs : PBYTE;
+
+     //
+    // Following fields have been added in WEBAUTHN_ASSERTION_VERSION_6
+    //
+
+    // UTF-8 encoded JSON serialization of the client data.
+    cbClientDataJSON : DWORD;
+    //_Field_size_bytes_(cbClientDataJSON)
+    pbClientDataJSON : PBYTE;
+
+    // UTF-8 encoded JSON serialization of the AuthenticationResponse.
+    cbAuthenticationResponseJSON : DWORD;
+    //_Field_size_bytes_(cbAuthenticationResponseJSON)
+    pbAuthenticationResponseJSON : PBYTE;
   end;
   WEBAUTHN_ASSERTION = _WEBAUTHN_ASSERTION;
   TWebAutNAssertion = WEBAUTHN_ASSERTION;
